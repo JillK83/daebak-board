@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import DramaCard from './DramaCard';
+import DramaFormInline from './DramaFormInline';
 
 const EmptyStateIcon = ({ id }) => {
   switch (id) {
@@ -54,7 +56,9 @@ const EmptyStateIcon = ({ id }) => {
   }
 };
 
-export default function StatusSection({ id, label, icon, dramas = [], emptyStateText, onMoveDrama, onUpdateRating, onDeleteDrama, onEditDrama }) {
+export default function StatusSection({ id, label, icon, dramas = [], emptyStateText, onMoveDrama, onUpdateRating, onDeleteDrama, onEditDrama, onAddDrama }) {
+  const [isAdding, setIsAdding] = useState(false);
+
   // Determine colors based on id using Tailwind custom config tokens
   const bgColors = {
     backlog: 'bg-backlog-bg border-backlog-border text-backlog-text',
@@ -81,9 +85,24 @@ export default function StatusSection({ id, label, icon, dramas = [], emptyState
       </div>
 
       {/* Add Show Button */}
-      <button className="w-full bg-transparent border border-dashed border-border-dashed rounded-[8px] py-[7px] px-3 flex items-center justify-center gap-1 hover:border-logo-accent group transition-colors cursor-pointer">
-        <span className="font-nunito text-[11px] text-text-ghost group-hover:text-text-secondary transition-colors">+ Add show</span>
-      </button>
+      {!isAdding && (
+        <button 
+          onClick={() => setIsAdding(true)}
+          className="w-full bg-transparent border border-dashed border-border-dashed rounded-[8px] py-[7px] px-3 flex items-center justify-center gap-1 hover:border-logo-accent group transition-colors cursor-pointer"
+        >
+          <span className="font-nunito text-[11px] text-text-ghost group-hover:text-text-secondary transition-colors">+ Add show</span>
+        </button>
+      )}
+
+      {isAdding && (
+        <DramaFormInline 
+          onSave={(payload) => {
+            onAddDrama(id, payload);
+            setIsAdding(false);
+          }}
+          onCancel={() => setIsAdding(false)}
+        />
+      )}
 
       {/* Card List Area (empty state placeholder) */}
       {dramas.length === 0 ? (

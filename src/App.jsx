@@ -25,6 +25,7 @@ function App() {
           ...d,
           column: d.status === 'to_watch' ? 'backlog' : d.status,
           year: d.release_year,
+          totalEpisodes: d.total_episodes,
           male_lead: d.featured_male_cast,
           female_lead: d.featured_female_cast,
           platforms: d.platforms ? d.platforms.split(',').map(s => s.trim()) : [],

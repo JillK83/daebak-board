@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { track } from '../utils/analytics';
+import DramaFormInline from './DramaFormInline';
 
 const columns = [
   { id: 'backlog', label: 'Backlog' },
@@ -10,11 +11,13 @@ const columns = [
 ];
 
 export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDeleteDrama, onEditDrama }) {
+  const [isEditing, setIsEditing] = useState(false);
   const [isRatingOpen, setIsRatingOpen] = useState(false);
   const [ratingValue, setRatingValue] = useState(drama.rating || 1);
   const [ratingInteracted, setRatingInteracted] = useState(false);
   const [isMoveOpen, setIsMoveOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const ratingRef = useRef();
   const moveRef = useRef();
@@ -51,12 +54,25 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
   const displayCast = cast || 'Top Cast';
   const platformsArr = Array.isArray(drama.platforms) ? drama.platforms : (drama.platforms ? [drama.platforms] : []);
 
+  if (isEditing) {
+    return (
+      <DramaFormInline
+        initialData={drama}
+        onSave={(payload) => {
+          onEditDrama(drama.id, payload);
+          setIsEditing(false);
+        }}
+        onCancel={() => setIsEditing(false)}
+      />
+    );
+  }
+
   return (
     <div className="relative flex flex-row p-padding-card bg-card border border-border rounded-card gap-gap-card-inner group hover:border-border-hover hover:shadow-card-hover transition-all w-full text-left">
       {/* Edit / Remove Overlay */}
       <div className="absolute top-[10px] right-[10px] flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
         <button 
-          onClick={() => { console.log("Edit clicked"); if(onEditDrama) onEditDrama(drama.id); }}
+          onClick={() => setIsEditing(true)}
           className="relative flex items-center justify-center w-action-btn-size h-action-btn-size rounded-action-btn border border-border bg-base group/btn hover:border-edit-hover cursor-pointer"
           title="Edit"
         >
@@ -86,15 +102,24 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
       </div>
 
       {/* Thumbnail */}
-      <div className="w-thumb-width h-thumb-height bg-thumb-bg rounded-[8px] flex items-center justify-center shrink-0">
-         <svg width="48" height="60" viewBox="0 0 48 60" className="opacity-[0.32]">
-           <circle cx="18" cy="28" r="5" fill="none" stroke="#8B7B6E" strokeWidth="1.5"/>
-           <circle cx="30" cy="28" r="5" fill="none" stroke="#8B7B6E" strokeWidth="1.5"/>
-           <line x1="18" y1="33" x2="16" y2="46" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
-           <line x1="30" y1="33" x2="32" y2="46" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
-           <line x1="18" y1="38" x2="25" y2="36" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
-           <line x1="30" y1="38" x2="23" y2="36" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
-         </svg>
+      <div className="w-thumb-width h-thumb-height bg-thumb-bg rounded-[8px] flex items-center justify-center shrink-0 overflow-hidden relative">
+        {drama.poster_url && !imgError ? (
+          <img 
+            src={drama.poster_url} 
+            alt={drama.title}
+            onError={() => setImgError(true)}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <svg width="48" height="60" viewBox="0 0 48 60" className="opacity-[0.32]">
+            <circle cx="18" cy="28" r="5" fill="none" stroke="#8B7B6E" strokeWidth="1.5"/>
+            <circle cx="30" cy="28" r="5" fill="none" stroke="#8B7B6E" strokeWidth="1.5"/>
+            <line x1="18" y1="33" x2="16" y2="46" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="30" y1="33" x2="32" y2="46" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="18" y1="38" x2="25" y2="36" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="30" y1="38" x2="23" y2="36" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        )}
       </div>
 
       {/* Content */}
@@ -105,20 +130,6 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
         <p className="font-nunito text-[11px] text-text-ghost">
           {drama.year}{drama.totalEpisodes ? ` · ${drama.totalEpisodes} ep` : ''}
         </p>
-
-        {drama.column === 'watching' && drama.totalEpisodes && (
-          <div className="flex items-center gap-2 mt-2">
-            <div className="flex-1 h-progress-height bg-progress-track rounded-[2px]">
-              <div 
-                className="h-full bg-progress-fill rounded-[2px]" 
-                style={{ width: `${(drama.currentEpisode || 0) / drama.totalEpisodes * 100}%` }}
-              ></div>
-            </div>
-            <span className="font-nunito text-[10px] text-text-ghost whitespace-nowrap">
-              Ep {drama.currentEpisode || 0} / {drama.totalEpisodes}
-            </span>
-          </div>
-        )}
 
         <div className="h-[1px] bg-divider w-full my-[10px]"></div>
 
