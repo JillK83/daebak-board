@@ -1,0 +1,18 @@
+{
+  "project": "daebak-board",
+  "architecture": {
+    "framework": "React (TypeScript)",
+    "styling": "Tailwind CSS (High-Contrast, Tactile UI Elements)",
+    "state": "Deterministic local storage / Context-driven client filtering"
+  },
+  "domain_context": {
+    "core_focus": "K-Drama Tracking & Analytics Engine",
+    "data_entities": ["Watch State", "Lead Cast Tracking", "Production Studios", "Rewatch Intent Scoring"],
+    "integrations": ["TMDB API (The Movie Database)"]
+  },
+  "rules": [
+    "Prioritize explicit, strongly-typed TypeScript interfaces for all API payloads.",
+    "Maintain a distinct, high-contrast visual identity—clean grid structures, explicit card borders, high-density informational tables.",
+    "Never use generic placeholders or ambiguous variable names in component states."
+  ]
+}
