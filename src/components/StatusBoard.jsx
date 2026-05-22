@@ -1,10 +1,12 @@
 import StatusSection from './StatusSection';
 import { supabase } from '../lib/supabase';
+import { track } from '../utils/analytics';
 
 const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
 export default function StatusBoard({ dramas, setDramas, isLoading }) {
   const handleMoveDrama = async (id, targetColumn) => {
+    track('status_updated', { drama_id: id, new_status: targetColumn });
     // Optimistic update
     setDramas(prev => prev.map(d => d.id === id ? { ...d, column: targetColumn } : d));
     
@@ -14,11 +16,15 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
         .from('kdramas')
         .update({ status: dbStatus, updated_at: new Date().toISOString() })
         .eq('id', id);
-      if (error) console.error("Error moving drama:", error);
+      if (error) {
+        console.error("Error moving drama:", error);
+        track('supabase_error', { operation: 'move_drama', error: error.message });
+      }
     }
   };
 
   const handleUpdateRating = async (id, newRating) => {
+    track('rating_updated', { drama_id: id, new_rating: newRating });
     setDramas(prev => prev.map(d => d.id === id ? { ...d, rating: newRating } : d));
     
     if (!isDemoMode && !String(id).startsWith('-')) {
@@ -26,11 +32,15 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
         .from('kdramas')
         .update({ rating: newRating, updated_at: new Date().toISOString() })
         .eq('id', id);
-      if (error) console.error("Error updating rating:", error);
+      if (error) {
+        console.error("Error updating rating:", error);
+        track('supabase_error', { operation: 'update_rating', error: error.message });
+      }
     }
   };
 
   const handleDeleteDrama = async (id) => {
+    track('show_deleted', { drama_id: id });
     setDramas(prev => prev.filter(d => d.id !== id));
     
     if (!isDemoMode && !String(id).startsWith('-')) {
@@ -38,7 +48,10 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
         .from('kdramas')
         .delete()
         .eq('id', id);
-      if (error) console.error("Error deleting drama:", error);
+      if (error) {
+        console.error("Error deleting drama:", error);
+        track('supabase_error', { operation: 'delete_drama', error: error.message });
+      }
     }
   };
 

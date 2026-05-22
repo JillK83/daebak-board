@@ -3,6 +3,8 @@ import TopBar from './components/TopBar';
 import StatusBoard from './components/StatusBoard';
 import { supabase } from './lib/supabase';
 
+import { track } from './utils/analytics';
+
 const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
 function App() {
@@ -17,8 +19,8 @@ function App() {
       
       if (error) {
         console.error('Error fetching dramas:', error);
+        track('supabase_error', { operation: 'fetch_dramas', error: error.message });
       } else if (data) {
-        console.log('Raw data from Supabase:', data);
         const mappedData = data.map(d => ({
           ...d,
           column: d.status === 'to_watch' ? 'backlog' : d.status,

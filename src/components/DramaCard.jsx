@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useClickOutside } from '../hooks/useClickOutside';
+import { track } from '../utils/analytics';
 
 const columns = [
   { id: 'backlog', label: 'Backlog' },
@@ -64,7 +65,10 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
         <div ref={deleteRef} className="relative">
           {!isDeleteConfirmOpen ? (
             <button 
-              onClick={() => setIsDeleteConfirmOpen(true)}
+              onClick={() => {
+                setIsDeleteConfirmOpen(true);
+                track('delete_confirmation_opened', { drama_id: drama.id, title: drama.title });
+              }}
               className="flex items-center justify-center w-action-btn-size h-action-btn-size rounded-action-btn border border-border bg-base group/btn hover:border-remove-hover cursor-pointer"
               title="Remove"
             >
