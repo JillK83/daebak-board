@@ -1,13 +1,6 @@
+import DramaCard from './DramaCard';
 
-type StatusSectionProps = {
-  id: 'backlog' | 'watching' | 'completed' | 'rewatch';
-  label: string;
-  icon: string;
-  count: number;
-  emptyStateText: string;
-};
-
-const EmptyStateIcon = ({ id }: { id: StatusSectionProps['id'] }) => {
+const EmptyStateIcon = ({ id }) => {
   switch (id) {
     case 'backlog':
       return (
@@ -61,7 +54,7 @@ const EmptyStateIcon = ({ id }: { id: StatusSectionProps['id'] }) => {
   }
 };
 
-export default function StatusSection({ id, label, icon, count, emptyStateText }: StatusSectionProps) {
+export default function StatusSection({ id, label, icon, dramas = [], emptyStateText, onMoveDrama, onUpdateRating, onDeleteDrama, onEditDrama }) {
   // Determine colors based on id using Tailwind custom config tokens
   const bgColors = {
     backlog: 'bg-backlog-bg border-backlog-border text-backlog-text',
@@ -83,24 +76,39 @@ export default function StatusSection({ id, label, icon, count, emptyStateText }
           </span>
         </div>
         <div className={`flex items-center justify-center w-[18px] h-[18px] rounded-full border-[1.5px] ${headerColors.split(' ')[0]} ${headerColors.split(' ')[1]} ${headerColors.split(' ')[2]}`}>
-          <span className="font-nunito font-bold text-[10px] leading-none mt-[1px]">{count}</span>
+          <span className="font-nunito font-bold text-[10px] leading-none mt-[1px]">{dramas.length}</span>
         </div>
       </div>
 
       {/* Add Show Button */}
-      <button className="w-full bg-transparent border border-dashed border-border-dashed rounded-[8px] py-[7px] px-3 flex items-center justify-center gap-1 hover:border-logo-accent group transition-colors">
+      <button className="w-full bg-transparent border border-dashed border-border-dashed rounded-[8px] py-[7px] px-3 flex items-center justify-center gap-1 hover:border-logo-accent group transition-colors cursor-pointer">
         <span className="font-nunito text-[11px] text-text-ghost group-hover:text-text-secondary transition-colors">+ Add show</span>
       </button>
 
       {/* Card List Area (empty state placeholder) */}
-      <div className="flex-1 flex flex-col items-center justify-center bg-base border border-dashed border-border-dashed rounded-empty p-6 text-center gap-2">
-        <div className="opacity-30 mb-2">
-           <EmptyStateIcon id={id} />
+      {dramas.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center bg-base border border-dashed border-border-dashed rounded-empty p-6 text-center gap-2">
+          <div className="opacity-30 mb-2">
+             <EmptyStateIcon id={id} />
+          </div>
+          <p className="font-playfair italic text-[11px] text-[#C4B8AE]">
+            {emptyStateText}
+          </p>
         </div>
-        <p className="font-playfair italic text-[11px] text-[#C4B8AE]">
-          {emptyStateText}
-        </p>
-      </div>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {dramas.map(drama => (
+            <DramaCard 
+              key={drama.id} 
+              drama={drama} 
+              onMoveDrama={onMoveDrama}
+              onUpdateRating={onUpdateRating}
+              onDeleteDrama={onDeleteDrama}
+              onEditDrama={onEditDrama}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

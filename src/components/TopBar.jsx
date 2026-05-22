@@ -1,6 +1,4 @@
-
-
-export default function TopBar() {
+export default function TopBar({ stats = { tracked: 0, active: 0, done: 0 } }) {
   return (
     <div className="flex flex-row items-center justify-between bg-base border-b border-border py-3 px-5">
       {/* Logo */}
@@ -24,17 +22,17 @@ export default function TopBar() {
       {/* Stats */}
       <div className="flex flex-row items-center gap-[10px]">
         <div className="flex items-baseline gap-1">
-          <span className="font-nunito font-bold text-[13px] text-text-primary">0</span>
+          <span className="font-nunito font-bold text-[13px] text-text-primary">{stats.tracked}</span>
           <span className="font-nunito text-[11px] text-text-secondary">tracked</span>
         </div>
         <div className="w-[1px] h-[14px] bg-[#DDD5CB]"></div>
         <div className="flex items-baseline gap-1">
-          <span className="font-nunito font-bold text-[13px] text-text-primary">0</span>
+          <span className="font-nunito font-bold text-[13px] text-text-primary">{stats.active}</span>
           <span className="font-nunito text-[11px] text-text-secondary">active</span>
         </div>
         <div className="w-[1px] h-[14px] bg-[#DDD5CB]"></div>
         <div className="flex items-baseline gap-1">
-          <span className="font-nunito font-bold text-[13px] text-text-primary">0</span>
+          <span className="font-nunito font-bold text-[13px] text-text-primary">{stats.done}</span>
           <span className="font-nunito text-[11px] text-text-secondary">done</span>
         </div>
       </div>
