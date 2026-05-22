@@ -1,21 +1,61 @@
 import StatusSection from './StatusSection';
+import { supabase } from '../lib/supabase';
 
-export default function StatusBoard({ dramas, setDramas }) {
-  const handleMoveDrama = (id, targetColumn) => {
+const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
+
+export default function StatusBoard({ dramas, setDramas, isLoading }) {
+  const handleMoveDrama = async (id, targetColumn) => {
+    // Optimistic update
     setDramas(prev => prev.map(d => d.id === id ? { ...d, column: targetColumn } : d));
+    
+    if (!isDemoMode && !String(id).startsWith('-')) {
+      const dbStatus = targetColumn === 'backlog' ? 'to_watch' : targetColumn;
+      const { error } = await supabase
+        .from('kdramas')
+        .update({ status: dbStatus, updated_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) console.error("Error moving drama:", error);
+    }
   };
 
-  const handleUpdateRating = (id, newRating) => {
+  const handleUpdateRating = async (id, newRating) => {
     setDramas(prev => prev.map(d => d.id === id ? { ...d, rating: newRating } : d));
+    
+    if (!isDemoMode && !String(id).startsWith('-')) {
+      const { error } = await supabase
+        .from('kdramas')
+        .update({ rating: newRating, updated_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) console.error("Error updating rating:", error);
+    }
   };
 
-  const handleDeleteDrama = (id) => {
+  const handleDeleteDrama = async (id) => {
     setDramas(prev => prev.filter(d => d.id !== id));
+    
+    if (!isDemoMode && !String(id).startsWith('-')) {
+      const { error } = await supabase
+        .from('kdramas')
+        .delete()
+        .eq('id', id);
+      if (error) console.error("Error deleting drama:", error);
+    }
   };
 
   const handleEditDrama = (id) => {
     // handled inside DramaCard (console.log)
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 overflow-x-auto p-5 flex items-center justify-center">
+         <div className="flex flex-col items-center gap-3">
+           <i className="ti ti-loader animate-spin text-[24px] text-text-ghost"></i>
+           <span className="font-nunito italic text-[12px] text-text-ghost">Loading board...</span>
+         </div>
+      </div>
+    );
+  }
 
   const backlogDramas = dramas.filter(d => d.column === 'backlog');
   const watchingDramas = dramas.filter(d => d.column === 'watching');
