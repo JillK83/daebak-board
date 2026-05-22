@@ -18,7 +18,7 @@ Reference image to load:
 
 ## Tech Stack
 - React (functional components, hooks)
-- CSS Modules or styled-components — no Tailwind (preserve exact token values)
+- Use Tailwind CSS configured with design tokens from DESIGN_SYSTEM.md via tailwind.config.js. The PRD is the source of truth for all stack decisions.
 - Google Fonts: Playfair Display + Nunito (import in index.html or global CSS)
 - Tabler Icons via CDN for column header icons
 - No drag and drop
