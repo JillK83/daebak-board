@@ -46,11 +46,6 @@ function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-base w-full h-full font-nunito text-text-primary">
-      {isDemoMode && (
-        <div className="bg-[#FCE8D8] text-[#8B4A20] text-center text-[11px] py-[6px] font-nunito font-semibold border-b border-[#E0AA80]">
-          Demo mode: changes are temporary and reset on refresh
-        </div>
-      )}
       <TopBar stats={stats} />
       <StatusBoard dramas={dramas} setDramas={setDramas} isLoading={isLoading} />
     </div>
