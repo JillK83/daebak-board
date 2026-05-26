@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import TopBar from './components/TopBar';
 import StatusBoard from './components/StatusBoard';
+import LandingPage from './components/LandingPage';
 import { supabase } from './lib/supabase';
 
 import { track } from './utils/analytics';
@@ -11,6 +12,7 @@ function App() {
   const [dramas, setDramas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [entered, setEntered] = useState(false);
 
   useEffect(() => {
     async function fetchDramas() {
@@ -45,6 +47,10 @@ function App() {
         d.title.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : dramas;
+
+  if (!entered) {
+    return <LandingPage onEnterBoard={() => setEntered(true)} />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-base w-full h-full font-nunito text-text-primary">

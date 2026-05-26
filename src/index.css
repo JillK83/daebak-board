@@ -5,11 +5,25 @@ body {
   background-color: var(--color-base); /* Will use the base color if defined */
 }
 
-/* Base styles per design system */
 body {
   font-family: 'Nunito', sans-serif;
   color: #2C2C2C;
   background-color: #FAF7F2;
   margin: 0;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Landing Page Animations */
+@keyframes kenBurns {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-ken-burns {
+  animation: kenBurns 22s ease-in-out infinite alternate;
 }
