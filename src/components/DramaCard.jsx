@@ -16,7 +16,7 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
   const [ratingValue, setRatingValue] = useState(drama.rating || 1);
   const [ratingInteracted, setRatingInteracted] = useState(false);
   const [isMoveOpen, setIsMoveOpen] = useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   const ratingRef = useRef();
@@ -37,7 +37,7 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
   });
 
   useClickOutside(deleteRef, () => {
-    if (isDeleteConfirmOpen) setIsDeleteConfirmOpen(false);
+    if (showDeleteConfirm) setShowDeleteConfirm(false);
   });
 
   const handleRatingChange = (delta) => {
@@ -49,7 +49,6 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
       return newVal;
     });
   };
-
   const cast = [drama.male_lead, drama.female_lead].filter(Boolean).join(' · ');
   const displayCast = cast || 'Top Cast';
   const platformsArr = Array.isArray(drama.platforms) ? drama.platforms : (drama.platforms ? [drama.platforms] : []);
@@ -69,38 +68,6 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
 
   return (
     <div className="relative flex flex-row p-padding-card bg-card border border-border rounded-card gap-gap-card-inner group hover:border-border-hover hover:shadow-card-hover transition-all w-full text-left">
-      {/* Edit / Remove Overlay */}
-      <div className="absolute top-[10px] right-[10px] flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-        <button 
-          onClick={() => setIsEditing(true)}
-          className="relative flex items-center justify-center w-action-btn-size h-action-btn-size rounded-action-btn border border-border bg-base group/btn hover:border-edit-hover cursor-pointer"
-          title="Edit"
-        >
-          <i className="ti ti-pencil text-[12px] text-text-secondary group-hover/btn:text-edit-hover"></i>
-        </button>
-        <div ref={deleteRef} className="relative">
-          {!isDeleteConfirmOpen ? (
-            <button 
-              onClick={() => {
-                setIsDeleteConfirmOpen(true);
-                track('delete_confirmation_opened', { drama_id: drama.id, title: drama.title });
-              }}
-              className="flex items-center justify-center w-action-btn-size h-action-btn-size rounded-action-btn border border-border bg-base group/btn hover:border-remove-hover cursor-pointer"
-              title="Remove"
-            >
-              <i className="ti ti-x text-[12px] text-text-secondary group-hover/btn:text-remove-hover"></i>
-            </button>
-          ) : (
-            <button 
-              onClick={() => onDeleteDrama(drama.id)}
-              className="flex items-center justify-center px-2 h-action-btn-size rounded-action-btn border border-remove-hover bg-remove-hover text-card text-[10px] font-nunito hover:opacity-90 cursor-pointer"
-            >
-              Confirm?
-            </button>
-          )}
-        </div>
-      </div>
-
       {/* Thumbnail */}
       <div className="w-thumb-width h-thumb-height bg-thumb-bg rounded-[8px] flex items-center justify-center shrink-0 overflow-hidden relative">
         {drama.poster_url && !imgError ? (
@@ -121,15 +88,72 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
           </svg>
         )}
       </div>
-
       {/* Content */}
-      <div className="flex flex-col flex-1 min-w-0 pr-8">
-        <h3 className="font-playfair font-semibold text-[14px] text-text-primary leading-tight mb-1 truncate">
-          {drama.title}
-        </h3>
-        <p className="font-nunito text-[11px] text-text-ghost">
-          {drama.year}{drama.totalEpisodes ? ` · ${drama.totalEpisodes} ep` : ''}
-        </p>
+      <div className="flex flex-col flex-1 min-w-0">
+        {!showDeleteConfirm ? (
+          <div className="flex justify-between items-start gap-2 min-w-0">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-playfair font-semibold text-[14px] text-text-primary leading-tight mb-1 truncate">
+                {drama.title}
+              </h3>
+              <p className="font-nunito text-[11px] text-text-ghost">
+                {drama.year}{drama.totalEpisodes ? ` · ${drama.totalEpisodes} ep` : ''}
+              </p>
+            </div>
+
+            {/* Action Buttons Slot */}
+            <div ref={deleteRef} className="shrink-0 h-[24px] flex items-center justify-end">
+              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center justify-center w-action-btn-size h-action-btn-size rounded-action-btn border border-border bg-base group/btn hover:border-edit-hover cursor-pointer"
+                  title="Edit"
+                >
+                  <i className="ti ti-pencil text-[12px] text-text-secondary group-hover/btn:text-edit-hover"></i>
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowDeleteConfirm(true);
+                    track('delete_confirmation_opened', { id: drama.id, title: drama.title });
+                  }}
+                  className="flex items-center justify-center w-action-btn-size h-action-btn-size rounded-action-btn border border-border bg-base group/btn hover:border-remove-hover cursor-pointer"
+                  title="Remove"
+                >
+                  <i className="ti ti-x text-[12px] text-text-secondary group-hover/btn:text-remove-hover"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div ref={deleteRef} className="flex flex-col gap-1 w-full">
+            {/* Row 1: Delete/Cancel buttons aligned to right */}
+            <div className="flex justify-end items-center h-[24px] w-full">
+              <div className="flex gap-2 opacity-100 transition-opacity duration-200">
+                <button 
+                  onClick={() => onDeleteDrama(drama.id)}
+                  className="text-red-600 border border-red-300 rounded px-2 py-0.5 text-xs font-semibold cursor-pointer hover:bg-red-50 transition-colors"
+                >
+                  Delete
+                </button>
+                <button 
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="text-gray-500 border border-gray-200 rounded px-2 py-0.5 text-xs font-semibold cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+            {/* Row 2: Title and Year below it, with no truncation */}
+            <div className="w-full">
+              <h3 className="font-playfair font-semibold text-[14px] text-text-primary leading-tight mb-1">
+                {drama.title}
+              </h3>
+              <p className="font-nunito text-[11px] text-text-ghost">
+                {drama.year}{drama.totalEpisodes ? ` · ${drama.totalEpisodes} ep` : ''}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="h-[1px] bg-divider w-full my-[10px]"></div>
 
