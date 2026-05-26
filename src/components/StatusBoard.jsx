@@ -6,6 +6,15 @@ import { track } from '../utils/analytics';
 const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
 export default function StatusBoard({ dramas, setDramas, isLoading }) {
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
+
   const handleAddDrama = async (columnId, payload) => {
     const newId = isDemoMode ? -Date.now() : undefined;
     const dbStatus = columnId === 'backlog' ? 'to_watch' : columnId;
@@ -65,51 +74,109 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
 
   const handleMoveDrama = async (id, targetColumn) => {
     track('status_updated', { drama_id: id, new_status: targetColumn });
+    
+    // Find original column for rollback
+    const originalDrama = dramas.find(d => d.id === id);
+    const originalColumn = originalDrama ? originalDrama.column : null;
+    
     // Optimistic update
     setDramas(prev => prev.map(d => d.id === id ? { ...d, column: targetColumn } : d));
     
-    if (!isDemoMode && !String(id).startsWith('-')) {
-      const dbStatus = targetColumn === 'backlog' ? 'to_watch' : targetColumn;
-      const { error } = await supabase
-        .from('kdramas')
-        .update({ status: dbStatus, updated_at: new Date().toISOString() })
-        .eq('id', id);
-      if (error) {
-        console.error("Error moving drama:", error);
-        track('supabase_error', { operation: 'move_drama', error: error.message });
+    try {
+      if (!isDemoMode && !String(id).startsWith('-')) {
+        const dbStatus = targetColumn === 'backlog' ? 'to_watch' : targetColumn;
+        const { error } = await supabase
+          .from('kdramas')
+          .update({ status: dbStatus, updated_at: new Date().toISOString() })
+          .eq('id', id);
+        if (error) {
+          throw error;
+        }
       }
+    } catch (err) {
+      console.error("Error moving drama:", err);
+      track('supabase_error', { operation: 'move_drama', error: err.message });
+      
+      // Rollback to original column
+      if (originalColumn) {
+        setDramas(prev => prev.map(d => d.id === id ? { ...d, column: originalColumn } : d));
+      }
+      
+      // Show toast
+      showToast(err.message || 'Failed to move drama. Reverting changes.');
     }
   };
 
   const handleUpdateRating = async (id, newRating) => {
     track('rating_updated', { drama_id: id, new_rating: newRating });
+    
+    // Find original rating for rollback
+    const originalDrama = dramas.find(d => d.id === id);
+    const originalRating = originalDrama ? originalDrama.rating : null;
+    
+    // Optimistic update
     setDramas(prev => prev.map(d => d.id === id ? { ...d, rating: newRating } : d));
     
-    if (!isDemoMode && !String(id).startsWith('-')) {
-      const { error } = await supabase
-        .from('kdramas')
-        .update({ rating: newRating, updated_at: new Date().toISOString() })
-        .eq('id', id);
-      if (error) {
-        console.error("Error updating rating:", error);
-        track('supabase_error', { operation: 'update_rating', error: error.message });
+    try {
+      if (!isDemoMode && !String(id).startsWith('-')) {
+        const { error } = await supabase
+          .from('kdramas')
+          .update({ rating: newRating, updated_at: new Date().toISOString() })
+          .eq('id', id);
+        if (error) {
+          throw error;
+        }
       }
+    } catch (err) {
+      console.error("Error updating rating:", err);
+      track('supabase_error', { operation: 'update_rating', error: err.message });
+      
+      // Rollback to original rating
+      setDramas(prev => prev.map(d => d.id === id ? { ...d, rating: originalRating } : d));
+      
+      // Show toast
+      showToast(err.message || 'Failed to update rating. Reverting changes.');
     }
   };
 
   const handleDeleteDrama = async (id) => {
     track('show_deleted', { drama_id: id });
+    
+    // Find original drama for rollback
+    const originalDrama = dramas.find(d => d.id === id);
+    
+    // Optimistic update (remove)
     setDramas(prev => prev.filter(d => d.id !== id));
     
-    if (!isDemoMode && !String(id).startsWith('-')) {
-      const { error } = await supabase
-        .from('kdramas')
-        .delete()
-        .eq('id', id);
-      if (error) {
-        console.error("Error deleting drama:", error);
-        track('supabase_error', { operation: 'delete_drama', error: error.message });
+    try {
+      if (!isDemoMode && !String(id).startsWith('-')) {
+        const { error } = await supabase
+          .from('kdramas')
+          .delete()
+          .eq('id', id);
+        if (error) {
+          throw error;
+        }
       }
+    } catch (err) {
+      console.error("Error deleting drama:", err);
+      track('supabase_error', { operation: 'delete_drama', error: err.message });
+      
+      // Rollback: put the drama back in the list
+      if (originalDrama) {
+        setDramas(prev => {
+          const originalIndex = dramas.findIndex(d => d.id === id);
+          if (originalIndex !== -1) {
+            const newList = [...prev];
+            newList.splice(originalIndex, 0, originalDrama);
+            return newList;
+          }
+          return [...prev, originalDrama];
+        });
+      }
+      
+      // Show toast
+      showToast(err.message || 'Failed to delete drama. Reverting changes.');
     }
   };
 
@@ -178,6 +245,31 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
           onAddDrama={handleAddDrama}
         />
       </div>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div 
+          style={{
+            animation: 'slideUp 0.3s ease-out forwards',
+          }}
+          className="fixed bottom-6 right-6 bg-[#2C2C2C] text-[#FFFFFF] px-4 py-3 rounded-[8px] shadow-card-hover border border-border font-nunito text-xs flex items-center gap-2 z-50"
+        >
+          <style>{`
+            @keyframes slideUp {
+              from {
+                transform: translateY(20px);
+                opacity: 0;
+              }
+              to {
+                transform: translateY(0);
+                opacity: 1;
+              }
+            }
+          `}</style>
+          <i className="ti ti-alert-circle text-[#E87C7C] text-[14px]"></i>
+          <span>{toast}</span>
+        </div>
+      )}
     </div>
   );
 }
