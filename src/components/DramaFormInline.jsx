@@ -5,6 +5,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData }) {
     title: initialData?.title || '',
     release_year: initialData?.year || '',
     total_episodes: initialData?.totalEpisodes || '',
+    current_episode: initialData?.currentEpisode || initialData?.current_episode || '',
     featured_male_cast: initialData?.male_lead || '',
     featured_female_cast: initialData?.female_lead || '',
     poster_url: initialData?.poster_url || '',
@@ -36,6 +37,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData }) {
       title: formData.title.trim(),
       release_year: formData.release_year ? parseInt(formData.release_year, 10) : null,
       total_episodes: formData.total_episodes ? parseInt(formData.total_episodes, 10) : null,
+      current_episode: formData.current_episode ? parseInt(formData.current_episode, 10) : null,
       featured_male_cast: formData.featured_male_cast.trim() || null,
       featured_female_cast: formData.featured_female_cast.trim() || null,
       poster_url: formData.poster_url.trim() || null,
@@ -55,76 +57,116 @@ export default function DramaFormInline({ onSave, onCancel, initialData }) {
       
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
+          <label className="font-nunito text-[11px] text-[#7A726B] uppercase tracking-wider">
+            Title
+          </label>
           <input 
             required
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base"
-            placeholder="Title *"
+            className="border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
+            placeholder="Show title"
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-1">
+          <label className="font-nunito text-[11px] text-[#7A726B] uppercase tracking-wider">
+            Year
+          </label>
           <input 
             type="number"
             name="release_year"
             value={formData.release_year}
             onChange={handleChange}
-            className="flex-1 border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base min-w-0"
-            placeholder="Year"
-          />
-          <input 
-            type="number"
-            name="total_episodes"
-            value={formData.total_episodes}
-            onChange={handleChange}
-            className="flex-1 border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base min-w-0"
-            placeholder="Total Ep"
+            className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
+            placeholder="e.g. 2024"
           />
         </div>
 
-        <div className="flex gap-2">
-          <input 
-            name="featured_male_cast"
-            value={formData.featured_male_cast}
-            onChange={handleChange}
-            className="flex-1 border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base min-w-0"
-            placeholder="Male Lead"
-          />
-          <input 
-            name="featured_female_cast"
-            value={formData.featured_female_cast}
-            onChange={handleChange}
-            className="flex-1 border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base min-w-0"
-            placeholder="Female Lead"
-          />
+        <div className="flex gap-3">
+          <div className="flex flex-col gap-1 flex-1">
+            <label className="font-nunito text-[11px] text-[#7A726B] uppercase tracking-wider">
+              Current Ep
+            </label>
+            <input 
+              type="number"
+              name="current_episode"
+              value={formData.current_episode}
+              onChange={handleChange}
+              className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
+              placeholder="e.g. 8"
+            />
+          </div>
+          <div className="flex flex-col gap-1 flex-1">
+            <label className="font-nunito text-[11px] text-[#7A726B] uppercase tracking-wider">
+              Total Ep
+            </label>
+            <input 
+              type="number"
+              name="total_episodes"
+              value={formData.total_episodes}
+              onChange={handleChange}
+              className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
+              placeholder="e.g. 16"
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <div className="flex flex-col gap-1 flex-1">
+            <label className="font-nunito text-[11px] text-[#7A726B] uppercase tracking-wider">
+              Male Lead
+            </label>
+            <input 
+              name="featured_male_cast"
+              value={formData.featured_male_cast}
+              onChange={handleChange}
+              className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
+              placeholder="e.g. Song Kang"
+            />
+          </div>
+          <div className="flex flex-col gap-1 flex-1">
+            <label className="font-nunito text-[11px] text-[#7A726B] uppercase tracking-wider">
+              Female Lead
+            </label>
+            <input 
+              name="featured_female_cast"
+              value={formData.featured_female_cast}
+              onChange={handleChange}
+              className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
+              placeholder="e.g. Kim Yoo-jung"
+            />
+          </div>
         </div>
 
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Platforms</span>
-          <div className="flex flex-wrap gap-2">
-            {['Netflix', 'Viki', 'Wavve'].map(p => (
-              <label key={p} className="flex items-center gap-1 cursor-pointer group">
-                <input 
+          <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-1">Platforms</span>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {['Netflix', 'Viki', 'Wavve', 'Hulu', 'Disney+', 'Prime Video'].map(platform => (
+              <label key={platform} className="flex items-center gap-1.5 cursor-pointer">
+                <input
                   type="checkbox"
-                  checked={formData.platforms.includes(p)}
-                  onChange={() => handlePlatformToggle(p)}
-                  className="accent-logo-accent cursor-pointer w-3 h-3"
+                  checked={formData.platforms.includes(platform)}
+                  onChange={() => handlePlatformToggle(platform)}
+                  className="w-[13px] h-[13px] accent-[#C4785A] cursor-pointer"
                 />
-                <span className="text-[11px] text-text-primary group-hover:text-logo-accent transition-colors">{p}</span>
+                <span className="font-nunito text-[12px] text-[#5E5752]">{platform}</span>
               </label>
             ))}
           </div>
         </div>
 
         <div className="flex flex-col gap-1">
+          <label className="font-nunito text-[11px] text-[#7A726B] uppercase tracking-wider">
+            Poster URL
+          </label>
           <input 
             name="poster_url"
             value={formData.poster_url}
             onChange={handleChange}
-            className="border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base"
-            placeholder="Poster URL"
+            className="border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
+            placeholder="https://..."
           />
         </div>
 

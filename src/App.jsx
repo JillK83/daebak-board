@@ -10,6 +10,7 @@ const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 function App() {
   const [dramas, setDramas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     async function fetchDramas() {
@@ -26,6 +27,7 @@ function App() {
           column: d.status === 'to_watch' ? 'backlog' : d.status,
           year: d.release_year,
           totalEpisodes: d.total_episodes,
+          currentEpisode: d.current_episode,
           male_lead: d.featured_male_cast,
           female_lead: d.featured_female_cast,
           platforms: d.platforms ? d.platforms.split(',').map(s => s.trim()) : [],
@@ -38,16 +40,16 @@ function App() {
     fetchDramas();
   }, []);
 
-  const stats = {
-    tracked: dramas.length,
-    active: dramas.filter(d => d.column === 'watching').length,
-    done: dramas.filter(d => d.column === 'completed').length
-  };
+  const filteredDramas = searchQuery.trim()
+    ? dramas.filter(d =>
+        d.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : dramas;
 
   return (
     <div className="flex flex-col min-h-screen bg-base w-full h-full font-nunito text-text-primary">
-      <TopBar stats={stats} />
-      <StatusBoard dramas={dramas} setDramas={setDramas} isLoading={isLoading} />
+      <TopBar searchQuery={searchQuery} onSearch={setSearchQuery} />
+      <StatusBoard dramas={filteredDramas} setDramas={setDramas} isLoading={isLoading} />
     </div>
   );
 }

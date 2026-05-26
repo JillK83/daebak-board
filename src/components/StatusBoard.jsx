@@ -5,6 +5,13 @@ import { track } from '../utils/analytics';
 
 const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
+const STATUS_LABELS = {
+  to_watch: 'Backlog / To Watch',
+  watching: 'Currently Watching',
+  completed: 'Completed & Scored',
+  rewatch: 'The Rewatch Pile'
+};
+
 export default function StatusBoard({ dramas, setDramas, isLoading }) {
   const [toast, setToast] = useState(null);
 
@@ -65,6 +72,7 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
       title: payload.title,
       year: payload.release_year,
       totalEpisodes: payload.total_episodes,
+      currentEpisode: payload.current_episode,
       male_lead: payload.featured_male_cast,
       female_lead: payload.featured_female_cast,
       platforms: payload.platforms ? payload.platforms.split(',').map(s => s.trim()) : [],
@@ -140,42 +148,29 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
   };
 
   const handleDeleteDrama = async (id) => {
-    track('show_deleted', { drama_id: id });
+    const previousDramas = [...dramas];
     
-    // Find original drama for rollback
-    const originalDrama = dramas.find(d => d.id === id);
-    
-    // Optimistic update (remove)
+    // Optimistic delete
     setDramas(prev => prev.filter(d => d.id !== id));
     
+    if (isDemoMode || String(id).startsWith('-')) {
+      track('show_deleted', { drama_id: id });
+      return;
+    }
+    
     try {
-      if (!isDemoMode && !String(id).startsWith('-')) {
-        const { error } = await supabase
-          .from('kdramas')
-          .delete()
-          .eq('id', id);
-        if (error) {
-          throw error;
-        }
+      track('show_deleted', { drama_id: id });
+      const { error } = await supabase
+        .from('kdramas')
+        .delete()
+        .eq('id', id);
+      if (error) {
+        throw error;
       }
     } catch (err) {
       console.error("Error deleting drama:", err);
       track('supabase_error', { operation: 'delete_drama', error: err.message });
-      
-      // Rollback: put the drama back in the list
-      if (originalDrama) {
-        setDramas(prev => {
-          const originalIndex = dramas.findIndex(d => d.id === id);
-          if (originalIndex !== -1) {
-            const newList = [...prev];
-            newList.splice(originalIndex, 0, originalDrama);
-            return newList;
-          }
-          return [...prev, originalDrama];
-        });
-      }
-      
-      // Show toast
+      setDramas(previousDramas);
       showToast(err.message || 'Failed to delete drama. Reverting changes.');
     }
   };
@@ -198,8 +193,9 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
       <div className="flex gap-6 min-w-max h-full">
         <StatusSection 
           id="backlog"
-          label="Backlog / My Watchlist"
-          icon="ti-device-cassette"
+          label={STATUS_LABELS.to_watch}
+          icon="ti-bookmark"
+          count={backlogDramas.length}
           dramas={backlogDramas}
           emptyStateText="Nothing here yet. Add your first drama."
           onMoveDrama={handleMoveDrama}
@@ -210,8 +206,9 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
         />
         <StatusSection 
           id="watching"
-          label="Currently Watching"
-          icon="ti-heart-play"
+          label={STATUS_LABELS.watching}
+          icon="ti-player-play"
+          count={watchingDramas.length}
           dramas={watchingDramas}
           emptyStateText="Nothing playing. Time to press play."
           onMoveDrama={handleMoveDrama}
@@ -222,8 +219,9 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
         />
         <StatusSection 
           id="completed"
-          label="Completed / History"
+          label={STATUS_LABELS.completed}
           icon="ti-star"
+          count={completedDramas.length}
           dramas={completedDramas}
           emptyStateText="No finished dramas yet. Keep watching."
           onMoveDrama={handleMoveDrama}
@@ -234,8 +232,9 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
         />
         <StatusSection 
           id="rewatch"
-          label="Rewatch"
+          label={STATUS_LABELS.rewatch}
           icon="ti-repeat"
+          count={rewatchDramas.length}
           dramas={rewatchDramas}
           emptyStateText="Nothing here yet. Time to start a new journey."
           onMoveDrama={handleMoveDrama}

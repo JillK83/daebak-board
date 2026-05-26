@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { track } from '../utils/analytics';
 import DramaFormInline from './DramaFormInline';
+import cardPlaceholderImg from '../assets/cardwithoutimage.png';
 
 const columns = [
   { id: 'backlog', label: 'Backlog' },
@@ -78,14 +79,12 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
             className="w-full h-full object-cover"
           />
         ) : (
-          <svg width="48" height="60" viewBox="0 0 48 60" className="opacity-[0.32]">
-            <circle cx="18" cy="28" r="5" fill="none" stroke="#8B7B6E" strokeWidth="1.5"/>
-            <circle cx="30" cy="28" r="5" fill="none" stroke="#8B7B6E" strokeWidth="1.5"/>
-            <line x1="18" y1="33" x2="16" y2="46" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
-            <line x1="30" y1="33" x2="32" y2="46" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
-            <line x1="18" y1="38" x2="25" y2="36" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
-            <line x1="30" y1="38" x2="23" y2="36" stroke="#8B7B6E" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
+          <img
+            src={cardPlaceholderImg}
+            alt=""
+            style={{ mixBlendMode: 'multiply' }}
+            className="w-[80%] h-[80%] object-contain"
+          />
         )}
       </div>
       {/* Content */}
@@ -93,12 +92,22 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
         {!showDeleteConfirm ? (
           <div className="flex justify-between items-start gap-2 min-w-0">
             <div className="flex-1 min-w-0">
-              <h3 className="font-playfair font-semibold text-[14px] text-text-primary leading-tight mb-1 truncate">
+              <h3 className="font-playfair font-semibold text-[15px] text-text-primary leading-tight mb-1 break-words">
                 {drama.title}
               </h3>
-              <p className="font-nunito text-[11px] text-text-ghost">
+              <p className="font-nunito text-[11px] text-[#9C8F86]">
                 {drama.year}{drama.totalEpisodes ? ` · ${drama.totalEpisodes} ep` : ''}
               </p>
+              {drama.column === 'watching' && drama.totalEpisodes && drama.currentEpisode && (
+                <div className="mt-[6px] mb-[2px]">
+                  <div className="w-full h-[3px] bg-[#EDE6DF] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#C4785A] rounded-full transition-all"
+                      style={{ width: `${Math.min((drama.currentEpisode / drama.totalEpisodes) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons Slot */}
@@ -148,9 +157,19 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
               <h3 className="font-playfair font-semibold text-[14px] text-text-primary leading-tight mb-1">
                 {drama.title}
               </h3>
-              <p className="font-nunito text-[11px] text-text-ghost">
+              <p className="font-nunito text-[11px] text-[#9C8F86]">
                 {drama.year}{drama.totalEpisodes ? ` · ${drama.totalEpisodes} ep` : ''}
               </p>
+              {drama.column === 'watching' && drama.totalEpisodes && drama.currentEpisode && (
+                <div className="mt-[6px] mb-[2px]">
+                  <div className="w-full h-[3px] bg-[#EDE6DF] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#C4785A] rounded-full transition-all"
+                      style={{ width: `${Math.min((drama.currentEpisode / drama.totalEpisodes) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -173,7 +192,9 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
                   <span className="font-nunito text-[12px] text-text-ghost">/ 10</span>
                 </>
               ) : (
-                <span className="font-playfair font-semibold text-[15px] text-rating-unset hover:text-logo-accent transition-colors">— / 10</span>
+                <span className="font-playfair font-semibold text-[15px] text-[#7A726B] hover:text-logo-accent transition-colors">
+                  — / 10
+                </span>
               )}
             </div>
           ) : (
@@ -197,7 +218,7 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
         </div>
 
         {displayCast && (
-          <p className="font-nunito font-medium text-[11px] text-text-actors mb-2">
+          <p className="font-nunito font-medium text-[12px] text-[#5E5752] mb-2">
             {displayCast}
           </p>
         )}
@@ -212,6 +233,9 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
               if (pLower === 'netflix') { border = 'border-l-[#E87C7C]'; bg = 'bg-[#FDF0EE]'; text = 'text-[#B94040]'; }
               if (pLower === 'viki') { border = 'border-l-[#A98FD4]'; bg = 'bg-[#F0EDF8]'; text = 'text-[#6148A8]'; }
               if (pLower === 'wavve') { border = 'border-l-[#5B9FE0]'; bg = 'bg-[#EEF4FD]'; text = 'text-[#1A5FA8]'; }
+              if (pLower === 'hulu') { border = 'border-l-[#1CE783]'; bg = 'bg-[#EDFBF4]'; text = 'text-[#0A7A45]'; }
+              if (pLower === 'disney+') { border = 'border-l-[#113CCF]'; bg = 'bg-[#EEF1FC]'; text = 'text-[#113CCF]'; }
+              if (pLower === 'prime video') { border = 'border-l-[#00A8E1]'; bg = 'bg-[#EAF7FD]'; text = 'text-[#006B8F]'; }
 
               return (
                 <span key={p} className={`border-l-[3px] ${border} ${bg} ${text} rounded-[4px] px-2 py-[2px] font-nunito font-bold text-[10px]`}>
@@ -225,11 +249,11 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
         <div ref={moveRef} className="mt-auto">
           {!isMoveOpen ? (
             <div 
-              className="inline-flex items-center gap-1 cursor-pointer group/move"
+              className="inline-flex items-center gap-1 cursor-pointer group/move py-[6px]"
               onClick={() => setIsMoveOpen(true)}
             >
-              <i className="ti ti-arrows-right-left text-[10px] text-[#C4B8AE] group-hover/move:text-[#9A8A7A] transition-colors"></i>
-              <span className="font-nunito italic text-[10px] text-[#C4B8AE] group-hover/move:text-[#9A8A7A] transition-colors">move to</span>
+              <i className="ti ti-arrows-right-left text-[11px] text-[#7A726B] group-hover/move:text-[#2E2A27] transition-colors"></i>
+              <span className="font-nunito text-[11px] text-[#7A726B] group-hover/move:text-[#2E2A27] transition-colors">move to</span>
             </div>
           ) : (
             <div className="flex flex-wrap gap-1">
