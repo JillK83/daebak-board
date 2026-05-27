@@ -1,73 +1,104 @@
-# React + TypeScript + Vite
+# Daebak Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A desktop-first K-Drama tracking app that organizes shows by watching lifecycle — 
+Backlog, Currently Watching, Completed & Scored, and The Rewatch Pile.
 
-Currently, two official plugins are available:
+## Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+[daebak-board.vercel.app](https://daebak-board.vercel.app)
 
-## React Compiler
+Demo mode is active on the public URL. You can add, rate, move, and delete 
+cards freely — changes are temporary and reset on refresh.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- Four-column lifecycle board with compact horizontal media cards
+- Manual show creation (title required, all other fields optional)
+- TMDB search and enrichment — auto-fills poster, cast, platforms, and year
+- Duplicate detection prevents adding the same show twice
+- Optimistic UI updates with full rollback on failure
+- 1–10 rating dropdown per show
+- Inline two-step delete confirmation
+- Demo mode protects seeded data on public deployment
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Vite + React (JavaScript)
+- Tailwind CSS
+- Supabase (Postgres, client-side SDK)
+- TMDB API (TV search, credits, watch providers)
+- Vercel (hosting, environment variables)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Local Setup
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. Clone the repo
+2. Install dependencies: `npm install`
+3. Create `.env.local` in the project root and add the following environment variables: # Daebak Board
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+A desktop-first K-Drama tracking app that organizes shows by watching lifecycle — 
+Backlog, Currently Watching, Completed & Scored, and The Rewatch Pile.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Live Demo
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+[daebak-board.vercel.app](https://daebak-board.vercel.app)
+
+Demo mode is active on the public URL. You can add, rate, move, and delete 
+cards freely — changes are temporary and reset on refresh.
+
+## Features
+
+- Four-column lifecycle board with compact horizontal media cards
+- Manual show creation (title required, all other fields optional)
+- TMDB search and enrichment — auto-fills poster, cast, platforms, and year
+- Duplicate detection prevents adding the same show twice
+- Optimistic UI updates with full rollback on failure
+- 1–10 rating dropdown per show
+- Inline two-step delete confirmation
+- Demo mode protects seeded data on public deployment
+
+## Tech Stack
+
+- Vite + React (JavaScript)
+- Tailwind CSS
+- Supabase (Postgres, client-side SDK)
+- TMDB API (TV search, credits, watch providers)
+- Vercel (hosting, environment variables)
+
+## Local Setup
+
+1. Clone the repo
+2. Install dependencies: `npm install`
+3. Create `.env.local` in the project root and add the following environment variables:VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_TMDB_API_KEY=your-tmdb-api-key
+VITE_DEMO_MODE=false **Where to find each value:**
+
+- `VITE_SUPABASE_URL` — Your Supabase project URL. Found in Supabase dashboard →
+  Project Settings → API → Project URL.
+
+- `VITE_SUPABASE_ANON_KEY` — Your Supabase public anon key. Found in the same
+  place as the URL, under API Keys. Use the `anon public` key, not the service role key.
+
+- `VITE_TMDB_API_KEY` — Your TMDB API key. Found at themoviedb.org → Settings →
+  API → API Key (v3 auth).
+
+- `VITE_DEMO_MODE` — Set to `false` for local development so changes persist to
+  Supabase. Set to `true` on public deployments to prevent mutations to the database.
+
+4. Run locally: `npm run dev`
+
+## Demo Mode
+
+Set `VITE_DEMO_MODE=true` for public deployments. In demo mode the app reads
+from Supabase on load but all add, update, rating, and delete interactions
+update local React state only — nothing is written to the database.
+
+## Attribution
+
+Data and images provided by TMDB. This product uses the TMDB API but is not
+endorsed or certified by TMDB.
+
+## Not in MVP
+
+Authentication, drag-and-drop, episode tracking, multi-user support,
+and TMDB recommendations are out of scope for this version.
