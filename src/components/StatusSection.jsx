@@ -3,7 +3,7 @@ import DramaCard from './DramaCard';
 import DramaFormInline from './DramaFormInline';
 import emptyColumnImg from '../assets/emptycolumn.png';
 
-export default function StatusSection({ id, label, icon, count, dramas = [], emptyStateText, onMoveDrama, onUpdateRating, onDeleteDrama, onEditDrama, onAddDrama }) {
+export default function StatusSection({ id, label, icon, count, dramas = [], allDramas = [], emptyStateText, onMoveDrama, onUpdateRating, onDeleteDrama, onEditDrama, onAddDrama }) {
   const [isAdding, setIsAdding] = useState(false);
 
   // Determine header pill styles based on column id
@@ -40,6 +40,7 @@ export default function StatusSection({ id, label, icon, count, dramas = [], emp
 
       {isAdding && (
         <DramaFormInline 
+          allDramas={allDramas}
           onSave={(payload) => {
             onAddDrama(id, payload);
             setIsAdding(false);

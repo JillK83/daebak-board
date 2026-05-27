@@ -25,7 +25,13 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
   const handleAddDrama = async (columnId, payload) => {
     const newId = isDemoMode ? -Date.now() : undefined;
     const dbStatus = columnId === 'backlog' ? 'to_watch' : columnId;
-    const dbPayload = { ...payload, status: dbStatus, source: 'manual', created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    const dbPayload = {
+      source: 'manual',
+      ...payload,
+      status: dbStatus,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
     
     let insertedId = newId;
     if (!isDemoMode) {
@@ -51,6 +57,8 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
       platforms: payload.platforms ? payload.platforms.split(',').map(s => s.trim()) : [],
       poster_url: payload.poster_url,
       rating: null,
+      tmdb_id: payload.tmdb_id || null,
+      source: payload.source || 'manual',
     };
     setDramas(prev => [...prev, newDramaLocal]);
   };
@@ -189,7 +197,7 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
   const rewatchDramas = dramas.filter(d => d.column === 'rewatch');
 
   return (
-    <div className="flex-1 overflow-x-auto overflow-y-hidden font-nunito flex items-start justify-center p-8 bg-app-bg">
+    <div className="flex-1 overflow-x-auto overflow-y-auto font-nunito flex flex-col items-center p-8 bg-app-bg">
       <div className="flex gap-6 min-w-max h-full">
         <StatusSection 
           id="backlog"
@@ -197,6 +205,7 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
           icon="ti-bookmark"
           count={backlogDramas.length}
           dramas={backlogDramas}
+          allDramas={dramas}
           emptyStateText="Nothing here yet. Add your first drama."
           onMoveDrama={handleMoveDrama}
           onUpdateRating={handleUpdateRating}
@@ -210,6 +219,7 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
           icon="ti-player-play"
           count={watchingDramas.length}
           dramas={watchingDramas}
+          allDramas={dramas}
           emptyStateText="Nothing playing. Time to press play."
           onMoveDrama={handleMoveDrama}
           onUpdateRating={handleUpdateRating}
@@ -223,6 +233,7 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
           icon="ti-star"
           count={completedDramas.length}
           dramas={completedDramas}
+          allDramas={dramas}
           emptyStateText="No finished dramas yet. Keep watching."
           onMoveDrama={handleMoveDrama}
           onUpdateRating={handleUpdateRating}
@@ -236,6 +247,7 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
           icon="ti-repeat"
           count={rewatchDramas.length}
           dramas={rewatchDramas}
+          allDramas={dramas}
           emptyStateText="Nothing here yet. Time to start a new journey."
           onMoveDrama={handleMoveDrama}
           onUpdateRating={handleUpdateRating}
@@ -244,6 +256,13 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
           onAddDrama={handleAddDrama}
         />
       </div>
+
+      <footer className="mt-12 pb-6 flex items-center justify-center gap-3 opacity-60">
+        <img src="/src/assets/tmdb-logo.svg" alt="TMDB logo" className="h-4" />
+        <span className="text-xs text-stone-500">
+          Data and images provided by TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.
+        </span>
+      </footer>
 
       {/* Toast Notification */}
       {toast && (
