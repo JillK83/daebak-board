@@ -123,7 +123,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
         </h3>
       </div>
       
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col gap-3">
         {/* TMDB Search UI for New Shows only */}
         {!initialData && (
           <div className="flex flex-col gap-2 mb-1">
@@ -166,6 +166,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     disabled={isEnriching}
+                    autoComplete="off"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -244,6 +245,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
             name="title"
             value={formData.title}
             onChange={handleChange}
+            autoComplete="off"
             className="border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
             placeholder="Show title"
           />
@@ -258,6 +260,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
             name="release_year"
             value={formData.release_year}
             onChange={handleChange}
+            autoComplete="off"
             className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
             placeholder="e.g. 2024"
           />
@@ -273,6 +276,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
               name="current_episode"
               value={formData.current_episode}
               onChange={handleChange}
+              autoComplete="off"
               className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
               placeholder="e.g. 8"
             />
@@ -286,6 +290,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
               name="total_episodes"
               value={formData.total_episodes}
               onChange={handleChange}
+              autoComplete="off"
               className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
               placeholder="e.g. 16"
             />
@@ -301,6 +306,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
               name="featured_male_cast"
               value={formData.featured_male_cast}
               onChange={handleChange}
+              autoComplete="off"
               className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
               placeholder="e.g. Song Kang"
             />
@@ -313,6 +319,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
               name="featured_female_cast"
               value={formData.featured_female_cast}
               onChange={handleChange}
+              autoComplete="off"
               className="w-full border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
               placeholder="e.g. Kim Yoo-jung"
             />
@@ -328,6 +335,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
                   type="checkbox"
                   checked={formData.platforms.includes(platform)}
                   onChange={() => handlePlatformToggle(platform)}
+                  autoComplete="off"
                   className="w-[13px] h-[13px] accent-[#C4785A] cursor-pointer"
                 />
                 <span className="font-nunito text-[12px] text-[#5E5752]">{platform}</span>
@@ -344,6 +352,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
             name="poster_url"
             value={formData.poster_url}
             onChange={handleChange}
+            autoComplete="off"
             className="border border-border rounded-[4px] px-2 py-1.5 text-[12px] outline-none focus:border-logo-accent bg-base placeholder-[#9C8F86]"
             placeholder="https://..."
           />

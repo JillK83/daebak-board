@@ -2,6 +2,7 @@ import { useState } from 'react';
 import StatusSection from './StatusSection';
 import { supabase } from '../lib/supabase';
 import { track } from '../utils/analytics';
+import tmdbLogo from '../assets/tmdb-logo.svg';
 
 const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
@@ -258,7 +259,7 @@ export default function StatusBoard({ dramas, setDramas, isLoading }) {
       </div>
 
       <footer className="mt-12 pb-6 flex items-center justify-center gap-3 opacity-60">
-        <img src="/src/assets/tmdb-logo.svg" alt="TMDB logo" className="h-4" />
+        <img src={tmdbLogo} alt="TMDB logo" className="h-4" />
         <span className="text-xs text-stone-500">
           Data and images provided by TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.
         </span>
