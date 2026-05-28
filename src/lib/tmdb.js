@@ -43,7 +43,7 @@ function normalizeShowBundle(details, credits, providers) {
 
   const platforms = rawPlatforms
     .filter(name => !rawPlatforms.some(
-      other => other !== name && other.toLowerCase().includes(name.toLowerCase())
+      other => other !== name && name.toLowerCase().includes(other.toLowerCase())
     ))
     .join(', ');
 
