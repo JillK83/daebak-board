@@ -37,14 +37,24 @@ function normalizeShowBundle(details, credits, providers) {
   const featuredMaleCast = cast.find(m => m.gender === 2)?.name || '';
   const featuredFemaleCast = cast.find(m => m.gender === 1)?.name || '';
   const topCast = cast.slice(0, 2).map(m => m.name).join(', ');
-  const rawPlatforms = usFlatrate
-    .map(p => p.provider_name)
-    .filter(name => !name.toLowerCase().includes('with'));
+  const PLATFORM_ALIASES = {
+    'rakuten viki': 'Viki',
+    'netflix basic with ads': 'Netflix',
+    'amazon prime video': 'Prime Video',
+  };
 
-  const platforms = rawPlatforms
-    .filter(name => !rawPlatforms.some(
-      other => other !== name && name.toLowerCase().includes(other.toLowerCase())
-    ))
+  const seenPlatforms = new Set();
+  const platforms = usFlatrate
+    .map(p => {
+      const lower = p.provider_name.toLowerCase();
+      return PLATFORM_ALIASES[lower] || p.provider_name;
+    })
+    .filter(name => {
+      if (name.toLowerCase().includes('with')) return false;
+      if (seenPlatforms.has(name)) return false;
+      seenPlatforms.add(name);
+      return true;
+    })
     .join(', ');
 
   return {
