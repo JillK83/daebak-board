@@ -68,7 +68,7 @@ export default function DramaCard({ drama, onMoveDrama, onUpdateRating, onDelete
   }
 
   return (
-    <div className="relative flex flex-row p-padding-card bg-card border border-border rounded-card gap-gap-card-inner group hover:border-border-hover hover:shadow-card-hover transition-all w-full text-left">
+    <div className="relative flex flex-row items-start min-h-[160px] p-padding-card bg-card border border-border rounded-card gap-gap-card-inner group hover:border-border-hover hover:shadow-card-hover transition-all w-full text-left">
       {/* Thumbnail */}
       <div className="w-thumb-width h-thumb-height bg-thumb-bg rounded-[8px] flex items-center justify-center shrink-0 overflow-hidden relative">
         {drama.poster_url && !imgError ? (

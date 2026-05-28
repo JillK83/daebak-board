@@ -10,7 +10,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
     featured_male_cast: initialData?.male_lead || '',
     featured_female_cast: initialData?.female_lead || '',
     poster_url: initialData?.poster_url || '',
-    platforms: initialData?.platforms || [],
+    platforms: initialData?.platforms || '',
     tmdb_id: initialData?.tmdb_id || null,
     source: initialData?.source || 'manual',
   });
@@ -107,7 +107,7 @@ export default function DramaFormInline({ onSave, onCancel, initialData, allDram
       featured_male_cast: formData.featured_male_cast.trim() || null,
       featured_female_cast: formData.featured_female_cast.trim() || null,
       poster_url: formData.poster_url.trim() || null,
-      platforms: formData.platforms.join(', ') || null,
+      platforms: Array.isArray(formData.platforms) ? formData.platforms.join(', ') : (formData.platforms || null),
       tmdb_id: formData.tmdb_id || null,
       source: formData.source || 'manual',
     };
