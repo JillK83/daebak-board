@@ -37,9 +37,14 @@ function normalizeShowBundle(details, credits, providers) {
   const featuredMaleCast = cast.find(m => m.gender === 2)?.name || '';
   const featuredFemaleCast = cast.find(m => m.gender === 1)?.name || '';
   const topCast = cast.slice(0, 2).map(m => m.name).join(', ');
-  const platforms = usFlatrate
+  const rawPlatforms = usFlatrate
     .map(p => p.provider_name)
-    .filter(name => !name.toLowerCase().includes('with'))
+    .filter(name => !name.toLowerCase().includes('with'));
+
+  const platforms = rawPlatforms
+    .filter(name => !rawPlatforms.some(
+      other => other !== name && other.toLowerCase().includes(name.toLowerCase())
+    ))
     .join(', ');
 
   return {
